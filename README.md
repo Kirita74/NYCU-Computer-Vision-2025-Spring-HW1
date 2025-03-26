@@ -1,6 +1,6 @@
 > # NYCU Computer Vision 2025 Spring HW1
-StudentID:313553037
-Name:黃瑜明
+- StudentID:313553037
+- Name:黃瑜明
 ## Introduction
 ## How to install
 1. Clone the repository
@@ -49,7 +49,7 @@ cd
 
 ## Performance snapshot
 ### Training Parameter Configuration
-
+![Image](https://github.com/Kirita74/VRDL/tree/main/image)
 ### Training Curve
 ### Confusion Matrix
 ### Perfomance

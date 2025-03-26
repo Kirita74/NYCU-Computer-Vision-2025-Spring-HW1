@@ -111,8 +111,10 @@ def mixup_data(x, y, alpha=1.0):
 def mixup_criterion(criterion, pred, y_a, y_b, lam):
     return lam * criterion(pred, y_a) + (1 - lam) * criterion(pred, y_b)
 
-
 def train():
+    '''
+    Training model
+    '''
     writer = SummaryWriter(log_dir=LOG_PATH)
 
     train_dataset, val_dataset, train_dataloader, val_dataloader = load_data()
@@ -125,10 +127,6 @@ def train():
         model.load_weight(path=WEIGHT_PATH)
     model.to(device=DEVICE)
 
-    # change dimension of model's final output
-
-    # model.load_state_dict(torch.load("resnext101_model_v2.pth", map_location = device))
-
     # Setting loss function and optimizer
     loss_fn = nn.CrossEntropyLoss(label_smoothing=0.1)
     optimizer = torch.optim.AdamW(
@@ -138,7 +136,6 @@ def train():
         betas=(0.9, 0.999)
     )
 
-    # training
 
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
         optimizer, T_max=30, eta_min=ETA_MIN)

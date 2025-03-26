@@ -20,7 +20,7 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 def get_transforms():
     """
-    Get the data augments
+    Get the data augmentations
     """
 
     train_transform = transforms.Compose([
@@ -61,7 +61,7 @@ def get_transforms():
 
 def load_data():
     """
-    Load data
+    Load data from train and val dataset
     """
 
     train_transform, val_transform = get_transforms()
@@ -93,9 +93,23 @@ def load_data():
 
     return train_dataset, val_dataset, train_dataloader, val_dataloader
 
+def mixup_data(x,y,alpha=1.0):
+    if alpha > 0:
+        lam = np.random.beta(alpha,alpha)
+    else:
+        lam = 1
+    batch_size = x.size()[0]
+    index = torch.randperm(batch_size).to(x.device)
+
+    mixed_x = lam * x + (1-lam) * x[index,:]
+    y_a, y_b = y, y[index]
+
+    return mixed_x, y_a, y_b, lam
+
+def mixup_criterion(criterion, pred, y_a, y_b, lam):
+    return lam * criterion(pred, y_a) + (1 - lam) * criterion(pred, y_b)
 
 def train():
-    # Docstring
     writer = SummaryWriter(log_dir=LOG_PATH)
 
     train_dataset, val_dataset, train_dataloader, val_dataloader = load_data()
@@ -144,10 +158,10 @@ def train():
 
         for batch_idx, (images, labels) in enumerate(train_dataloader):
             images, labels = images.to(DEVICE), labels.to(DEVICE)
-
+            images, target_a, target_b, lam = mixup_data(images, labels)
             optimizer.zero_grad()
             outputs = model(images)
-            loss = loss_fn(outputs, labels)
+            loss = mixup_criterion(loss_fn, outputs, target_a, target_b, lam)
             loss.backward()
             optimizer.step()
 
@@ -169,15 +183,20 @@ def train():
         model.eval()
         valid_correct = 0
         valid_total = 0
+        valid_loss = 0.0
+
         with torch.no_grad():
             for images, labels in val_dataloader:
                 images, labels = images.to(DEVICE), labels.to(DEVICE)
                 outputs = model(images)
                 _, predicted = torch.max(outputs, 1)
+                loss = loss_fn(outputs,labels).item()
+                valid_loss += loss
                 valid_total += labels.size(0)
                 valid_correct += (predicted == labels).sum().item()
 
         valid_acc = 100 * valid_correct / valid_total
+        valid_loss /= valid_total
 
         print(
             f"Epoch [{epoch + 1}/{EPOCHS}] - "
@@ -186,6 +205,7 @@ def train():
         )
 
         writer.add_scalar("Validation Accuracy", valid_acc, epoch)
+        writer.add_scalar("Validation Loss", valid_loss, epoch)
 
         if valid_acc > best_valid_acc:
             best_valid_acc = valid_acc
@@ -197,7 +217,7 @@ def train():
 def parse_args():
     parser = argparse.ArgumentParser()
     
-    parser.add_argument("DATAPATH", type=str, default="../data", help="Root directory of the dataset")
+    parser.add_argument("DATAPATH", type=str, default="./data", help="Root directory of the dataset")
     parser.add_argument("--num_epochs", type=int, default=100, help="Number of training epochs")
     parser.add_argument("--batch_size", type=int, default=32, help="Batch size for training")
     parser.add_argument("--learning_rate",type=float, default=1e-4, help="Learning rate")

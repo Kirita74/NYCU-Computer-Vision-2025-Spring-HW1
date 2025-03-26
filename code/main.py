@@ -96,14 +96,18 @@ def load_data():
 
 def train():
     # Docstring
-    writer = SummaryWriter(log_dir="logs/log12")
+    writer = SummaryWriter(log_dir=LOG_PATH)
 
     train_dataset, val_dataset, train_dataloader, val_dataloader = load_data()
     num_classes = len(train_dataset.classes)
 
-    model = CustomResnextModel(num_classes=num_classes, pretrained=False)
+    if(WEIGHT_PATH == None):
+        model = CustomResnextModel(num_classes=num_classes, pretrained=True)
+    else:
+        model = CustomResnextModel(num_classes=num_classes, pretrained=False)
+        model.load_weight(path=WEIGHT_PATH)
     model.to(device=DEVICE)
-    model.load_weight(path=WEIGHT_PATH)
+
     # change dimension of model's final output
 
     # model.load_state_dict(torch.load("resnext101_model_v2.pth", map_location = device))
@@ -113,27 +117,17 @@ def train():
     optimizer = torch.optim.AdamW(
         params=model.parameters(),
         lr=LEARNING_RATE,
-        weight_decay=1e-2,
+        weight_decay=OPTIMIZER_WEIGHT_DECAY,
         betas=(0.9, 0.999)
     )
 
     # training
 
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-        optimizer=optimizer,
-        mode='max',
-        factor=0.3,
-        patience=3,
-        threshold=0.005,
-        cooldown=2,
-        min_lr=1e-7,
-        verbose=True
-    )
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=30, eta_min=ETA_MIN)
     
-    num_epochs = 100
     best_valid_acc = 0.0
 
-    for epoch in range(num_epochs):
+    for epoch in range(EPOCHS):
         gc.collect()
         if epoch % 10 == 0:
             torch.cuda.empty_cache()
@@ -144,7 +138,7 @@ def train():
 
         training_bar = tqdm(
             train_dataloader,
-            desc=f"Epoch {epoch + 1}/{num_epochs}",
+            desc=f"Epoch {epoch + 1}/{EPOCHS}",
             total=len(train_dataloader)
         )
 
@@ -186,7 +180,7 @@ def train():
         valid_acc = 100 * valid_correct / valid_total
 
         print(
-            f"Epoch [{epoch + 1}/{num_epochs}] - "
+            f"Epoch [{epoch + 1}/{EPOCHS}] - "
             f"train Loss: {training_loss:.4f} - "
             f"validation accuracy: {valid_acc:.2f}%"
         )
@@ -195,7 +189,7 @@ def train():
 
         if valid_acc > best_valid_acc:
             best_valid_acc = valid_acc
-            model.save_weight(path="resnext101_model_v4.pth")
+            model.save_weight(path=WEIGHT_SAVE_PATH)
 
         scheduler.step(valid_acc)
     writer.close()
@@ -206,11 +200,12 @@ def parse_args():
     parser.add_argument("DATAPATH", type=str, default="./data", help="Root directory of the dataset")
     parser.add_argument("--num_epochs", type=int, default=100, help="Number of training epochs")
     parser.add_argument("--batch_size", type=int, default=32, help="Batch size for training")
-    parser.add_argument("--learning_rate",type=int, default=1e-4, help="Learning rate")
-    parser.add_argument("--optimizer_weight_decay",type=int, default=1e-5, help="Weight decay for AdamW")
-    parser.add_argument("--eta_min", type=int, default=1e-6, help="Minimum learing rate for scheduler")
+    parser.add_argument("--learning_rate",type=float, default=1e-4, help="Learning rate")
+    parser.add_argument("--optimizer_weight_decay",type=float, default=1e-5, help="Weight decay for AdamW")
+    parser.add_argument("--eta_min", type=float, default=1e-6, help="Minimum learing rate for scheduler")
     parser.add_argument("--pretrained_weight_path",type=str, default=None, help="Path of pretrained weight")
-    parser.add_argument("--save_path",type=str, default="weights",help="Folder to save model weight")
+    parser.add_argument("--save_path",type=str, default="weightp.pth",help="Path to save model weight")
+    parser.add_argument('--log_dir',type=str, default="logs", help="Folder of training log")
 
     return parser.parse_args()
 
@@ -219,8 +214,13 @@ if __name__ == '__main__':
     
     TRAIN_DATA_PATH = os.path.join(args.DATAPATH, "train")
     VAL_DATA_PATH = os.path.join(args.DATAPATH, "val")
+    EPOCHS = args.num_epochs
     LEARNING_RATE = args.learning_rate
     BATCH_SIZE = args.batch_size
+    OPTIMIZER_WEIGHT_DECAY = args.optimizer_weight_decay
+    ETA_MIN = args.eta_min
     WEIGHT_PATH = args.pretrained_weight_path
     WEIGHT_SAVE_PATH = args.save_path
+    LOG_PATH = args.log_dir
+
     train()

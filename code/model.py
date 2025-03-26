@@ -37,14 +37,11 @@ class CustomResnextModel(nn.Module):
         )
 
     def forward(self, x):
-        # Docstring
         x = self.base_model(x)
         return x
 
     def load_weight(self, path):
-        # Docstring
         self.load_state_dict(torch.load(path))
 
     def save_weight(self, path):
-        # Docstring
         torch.save(self.state_dict(), path)

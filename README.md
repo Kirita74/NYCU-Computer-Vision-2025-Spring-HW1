@@ -2,6 +2,7 @@
 - StudentID:313553037
 - Name:黃瑜明
 ## Introduction
+In this assignment, we utilize a model based on the ResNet architecture to classify natural organisms depicted in images into their corresponding categories. The goal is to accurately identify the species or biological class of each organism, among 100 distinct categories.
 ## How to install
 1. Clone the repository
 ```
@@ -52,24 +53,24 @@ cd code
 
 ## Performance snapshot
 ### Training Parameter Configuration
-|Parameter|Value|
-|---------|-----|
-|Model|`ResNeXt-101`|
-|Learing Rate|0.0001|
-|Batch Size|32|
-|Opimizer|`AdamW`|
-|Eta min|0.0000001|
-|T_max|30|
-|Scheduler|`CosineAnnealingLR`|
-|Label smoothing|0.1|
-|Criterion|`CrossEntropyLoss`|
+| Parameter       | Value               |
+| --------------- | ------------------- |
+| Model           | `ResNeXt-101`       |
+| Learing Rate    | 0.0001              |
+| Batch Size      | 32                  |
+| Opimizer        | `AdamW`             |
+| Eta min         | 0.0000001           |
+| T_max           | 30                  |
+| Scheduler       | `CosineAnnealingLR` |
+| Label smoothing | 0.1                 |
+| Criterion       | `CrossEntropyLoss`  |
 ### Training Curve
 ![Image](image/training_loss_epoch.png)
 ![Image](image/validation_accuracy.png)
 ### Confusion Matrix
 ![Image](image/confusion.png)
 ### Perfomance
-||Accuracy(%)|
-|----------|--|
-|Validation|90|
-|Public test|93|
+    ||Accuracy(%)|
+    |----------|--|
+    |Validation|90|
+    |Public test|93|

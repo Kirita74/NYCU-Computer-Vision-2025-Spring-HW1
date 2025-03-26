@@ -49,9 +49,24 @@ cd
 
 ## Performance snapshot
 ### Training Parameter Configuration
-
-![Image](image/training_loss_epoch.png)
-
+|Parameter|Value|
+|---------|-----|
+|Model|`ResNeXt-101`|
+|Learing Rate|0.0001|
+|Batch Size|32|
+|Opimizer|`AdamW`|
+|Eta min|0.0000001|
+|T_max|30|
+|Scheduler|`CosineAnnealingLR`|
+|Label smoothing|0.1|
+|Criterion|`CrossEntropyLoss`|
 ### Training Curve
+![Image](image/training_loss_epoch.png)
+![Image](image/validation_accuracy.png)
 ### Confusion Matrix
+![Image](image/confusion.png)
 ### Perfomance
+||Accuracy(%)|
+|----------|--|
+|Validation|90|
+|Public test|93|

@@ -197,7 +197,7 @@ def train():
 def parse_args():
     parser = argparse.ArgumentParser()
     
-    parser.add_argument("DATAPATH", type=str, default="./data", help="Root directory of the dataset")
+    parser.add_argument("DATAPATH", type=str, default="../data", help="Root directory of the dataset")
     parser.add_argument("--num_epochs", type=int, default=100, help="Number of training epochs")
     parser.add_argument("--batch_size", type=int, default=32, help="Batch size for training")
     parser.add_argument("--learning_rate",type=float, default=1e-4, help="Learning rate")

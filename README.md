@@ -49,7 +49,7 @@ cd
 
 ## Performance snapshot
 ### Training Parameter Configuration
-![Image](https://github.com/Kirita74/VRDL/tree/main/image)
+![Training Loss](https://github.com/Kirita74/VRDL/tree/main/image/training_loss_epoch.png)
 ### Training Curve
 ### Confusion Matrix
 ### Perfomance

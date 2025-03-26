@@ -5,11 +5,14 @@
 ## How to install
 1. Clone the repository
 ```
-git clone
-cd 
+git clone git@github.com:Kirita74/NYCU-Computer-Vision-2025-Spring-HW1.git
+cd NYCU-Computer-Vision-2025-Spring-HW1
 ```
 2. Create and activate conda environmen
 ```
+conda env create -f environment.yml
+conda activate CV
+cd code
 ```
 3. Download the dataset
 - Download the dataset form the provided [Link](https://drive.google.com/file/d/1fx4Z6xl5b6r4UFkBrn5l0oPEIagZxQ5u/view)

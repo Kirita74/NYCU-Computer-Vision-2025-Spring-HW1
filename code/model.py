@@ -6,7 +6,7 @@ from torchvision import models
 class CustomResnextModel(nn.Module):
 
     def __init__(self, num_classes, pretrained=True):
-        #Docstring
+        # Docstring
 
         super(CustomResnextModel, self).__init__()
 

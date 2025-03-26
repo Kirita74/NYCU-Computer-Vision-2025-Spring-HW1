@@ -14,9 +14,9 @@ from torch.utils.tensorboard import SummaryWriter
 from model import CustomResnextModel
 
 
-
 CLASS_MAPPING_FILE = "class_mapping.json"
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 
 def get_transforms():
     """
@@ -93,21 +93,24 @@ def load_data():
 
     return train_dataset, val_dataset, train_dataloader, val_dataloader
 
-def mixup_data(x,y,alpha=1.0):
+
+def mixup_data(x, y, alpha=1.0):
     if alpha > 0:
-        lam = np.random.beta(alpha,alpha)
+        lam = np.random.beta(alpha, alpha)
     else:
         lam = 1
     batch_size = x.size()[0]
     index = torch.randperm(batch_size).to(x.device)
 
-    mixed_x = lam * x + (1-lam) * x[index,:]
+    mixed_x = lam * x + (1 - lam) * x[index, :]
     y_a, y_b = y, y[index]
 
     return mixed_x, y_a, y_b, lam
 
+
 def mixup_criterion(criterion, pred, y_a, y_b, lam):
     return lam * criterion(pred, y_a) + (1 - lam) * criterion(pred, y_b)
+
 
 def train():
     writer = SummaryWriter(log_dir=LOG_PATH)
@@ -115,7 +118,7 @@ def train():
     train_dataset, val_dataset, train_dataloader, val_dataloader = load_data()
     num_classes = len(train_dataset.classes)
 
-    if(WEIGHT_PATH == None):
+    if (WEIGHT_PATH is None):
         model = CustomResnextModel(num_classes=num_classes, pretrained=True)
     else:
         model = CustomResnextModel(num_classes=num_classes, pretrained=False)
@@ -137,8 +140,9 @@ def train():
 
     # training
 
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=30, eta_min=ETA_MIN)
-    
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+        optimizer, T_max=30, eta_min=ETA_MIN)
+
     best_valid_acc = 0.0
 
     for epoch in range(EPOCHS):
@@ -190,7 +194,7 @@ def train():
                 images, labels = images.to(DEVICE), labels.to(DEVICE)
                 outputs = model(images)
                 _, predicted = torch.max(outputs, 1)
-                loss = loss_fn(outputs,labels).item()
+                loss = loss_fn(outputs, labels).item()
                 valid_loss += loss
                 valid_total += labels.size(0)
                 valid_correct += (predicted == labels).sum().item()
@@ -214,24 +218,62 @@ def train():
         scheduler.step(valid_acc)
     writer.close()
 
+
 def parse_args():
     parser = argparse.ArgumentParser()
-    
-    parser.add_argument("DATAPATH", type=str, default="./data", help="Root directory of the dataset")
-    parser.add_argument("--num_epochs", type=int, default=100, help="Number of training epochs")
-    parser.add_argument("--batch_size", type=int, default=32, help="Batch size for training")
-    parser.add_argument("--learning_rate",type=float, default=1e-4, help="Learning rate")
-    parser.add_argument("--optimizer_weight_decay",type=float, default=1e-5, help="Weight decay for AdamW")
-    parser.add_argument("--eta_min", type=float, default=1e-6, help="Minimum learing rate for scheduler")
-    parser.add_argument("--pretrained_weight_path",type=str, default=None, help="Path of pretrained weight")
-    parser.add_argument("--save_path",type=str, default="weightp.pth",help="Path to save model weight")
-    parser.add_argument('--log_dir',type=str, default="logs", help="Folder of training log")
+
+    parser.add_argument(
+        "DATAPATH",
+        type=str,
+        default="./data",
+        help="Root directory of the dataset")
+    parser.add_argument(
+        "--num_epochs",
+        type=int,
+        default=100,
+        help="Number of training epochs")
+    parser.add_argument(
+        "--batch_size",
+        type=int,
+        default=32,
+        help="Batch size for training")
+    parser.add_argument(
+        "--learning_rate",
+        type=float,
+        default=1e-4,
+        help="Learning rate")
+    parser.add_argument(
+        "--optimizer_weight_decay",
+        type=float,
+        default=1e-5,
+        help="Weight decay for AdamW")
+    parser.add_argument(
+        "--eta_min",
+        type=float,
+        default=1e-6,
+        help="Minimum learing rate for scheduler")
+    parser.add_argument(
+        "--pretrained_weight_path",
+        type=str,
+        default=None,
+        help="Path of pretrained weight")
+    parser.add_argument(
+        "--save_path",
+        type=str,
+        default="weightp.pth",
+        help="Path to save model weight")
+    parser.add_argument(
+        '--log_dir',
+        type=str,
+        default="logs",
+        help="Folder of training log")
 
     return parser.parse_args()
 
+
 if __name__ == '__main__':
     args = parse_args()
-    
+
     TRAIN_DATA_PATH = os.path.join(args.DATAPATH, "train")
     VAL_DATA_PATH = os.path.join(args.DATAPATH, "val")
     EPOCHS = args.num_epochs

@@ -61,14 +61,27 @@ def test():
         predict_label = idx_to_class[predict_label.item()]
         csvwriter.writerow([img_name, predict_label])
 
+
 def parse_args():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("test_data_path", type=str, default="data/test",help="Path of test data")
-    parser.add_argument("pretrained_weight_path",type=str, help="Path of pretrained weight")
-    parser.add_argument("--prediction_csv_path",type=str, default="prediction.csv", help="Path of prediction csv")
+    parser.add_argument(
+        "test_data_path",
+        type=str,
+        default="data/test",
+        help="Path of test data")
+    parser.add_argument(
+        "pretrained_weight_path",
+        type=str,
+        help="Path of pretrained weight")
+    parser.add_argument(
+        "--prediction_csv_path",
+        type=str,
+        default="prediction.csv",
+        help="Path of prediction csv")
 
     return parser.parse_args()
+
 
 if __name__ == '__main__':
     args = parse_args()

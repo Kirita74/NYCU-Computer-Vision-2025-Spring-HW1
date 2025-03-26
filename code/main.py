@@ -1,5 +1,7 @@
 import gc
+import os
 import json
+import argparse
 import numpy as np
 import torch
 import torch.nn as nn
@@ -12,12 +14,7 @@ from torch.utils.tensorboard import SummaryWriter
 from model import CustomResnextModel
 
 
-TRAIN_DATA_PATH = "data/train"
-VAL_DATA_PATH = "data/val"
-LEARNING_RATE = 1e-4
-BATCH_SIZE = 32
-LOG_PATH = "logs/log12"
-WEIGHT_PATH = ""
+
 CLASS_MAPPING_FILE = "class_mapping.json"
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -203,6 +200,27 @@ def train():
         scheduler.step(valid_acc)
     writer.close()
 
+def parse_args():
+    parser = argparse.ArgumentParser()
+    
+    parser.add_argument("DATAPATH", type=str, default="./data", help="Root directory of the dataset")
+    parser.add_argument("--num_epochs", type=int, default=100, help="Number of training epochs")
+    parser.add_argument("--batch_size", type=int, default=32, help="Batch size for training")
+    parser.add_argument("--learning_rate",type=int, default=1e-4, help="Learning rate")
+    parser.add_argument("--optimizer_weight_decay",type=int, default=1e-5, help="Weight decay for AdamW")
+    parser.add_argument("--eta_min", type=int, default=1e-6, help="Minimum learing rate for scheduler")
+    parser.add_argument("--pretrained_weight_path",type=str, default=None, help="Path of pretrained weight")
+    parser.add_argument("--save_path",type=str, default="weights",help="Folder to save model weight")
+
+    return parser.parse_args()
 
 if __name__ == '__main__':
+    args = parse_args()
+    
+    TRAIN_DATA_PATH = os.path.join(args.DATAPATH, "train")
+    VAL_DATA_PATH = os.path.join(args.DATAPATH, "val")
+    LEARNING_RATE = args.learning_rate
+    BATCH_SIZE = args.batch_size
+    WEIGHT_PATH = args.pretrained_weight_path
+    WEIGHT_SAVE_PATH = args.save_path
     train()

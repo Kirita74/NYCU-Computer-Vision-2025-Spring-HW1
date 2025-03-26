@@ -1,5 +1,6 @@
 import os
 import json
+import argparse
 import csv
 import torch
 from torch import nn
@@ -8,8 +9,7 @@ from PIL import Image
 
 from model import CustomResnextModel
 
-TEST_PATH = 'data/test'
-CSV_FILE_PATH = 'prediction.csv'
+
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
@@ -44,7 +44,8 @@ def test():
     imags_paths = [os.path.join(TEST_PATH, img) for img in os.listdir(
         TEST_PATH) if img.lower().endswith(('.png', '.jpg', '.jpeg'))]
 
-    model = CustomResnextModel(num_classes=100, pretrained=False)
+    model = CustomResnextModel(num_classes=len(class_to_idx), pretrained=False)
+    model.load_weight(PRETRAINED_WEIGHT_PATH)
     model.to(device=DEVICE)
     model.eval()
 
@@ -60,6 +61,20 @@ def test():
         predict_label = idx_to_class[predict_label.item()]
         csvwriter.writerow([img_name, predict_label])
 
+def parse_args():
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("test_data_path", type=str, default="data/test",help="Path of test data")
+    parser.add_argument("pretrained_weight_path",type=str, help="Path of pretrained weight")
+    parser.add_argument("--prediction_csv_path",type=str, default="prediction.csv", help="Path of prediction csv")
+
+    return parser.parse_args()
 
 if __name__ == '__main__':
+    args = parse_args()
+
+    TEST_PATH = args.test_data_path
+    PRETRAINED_WEIGHT_PATH = args.pretrained_weight_path
+    CSV_FILE_PATH = args.prediction_csv_path
+
     test()

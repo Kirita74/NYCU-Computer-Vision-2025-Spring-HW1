@@ -16,23 +16,23 @@ In this assignment, we utilize a model based on the ResNet architecture to class
     cd code
     ```
 3. Download the dataset
-- Download the dataset form the provided [Link](https://drive.google.com/file/d/1fx4Z6xl5b6r4UFkBrn5l0oPEIagZxQ5u/view)
-- Place it in the following structure
-```
-.
-├── code
-│   ├── main.py
-│   ├── model.py
-│   └── test.py
-├── data
-│   ├── train
-│   ├── val
-│   └── test
-├── environment.yml
-│   .
-│   .
-│   .
-```
+    - Download the dataset form the provided [Link](https://drive.google.com/file/d/1fx4Z6xl5b6r4UFkBrn5l0oPEIagZxQ5u/view)
+    - Place it in the following structure
+    ```
+    .
+    ├── code
+    │   ├── main.py
+    │   ├── model.py
+    │   └── test.py
+    ├── data
+    │   ├── train
+    │   ├── val
+    │   └── test
+    ├── environment.yml
+    │   .
+    │   .
+    │   .
+    ```
 ## Run
 - Train Model
     ```

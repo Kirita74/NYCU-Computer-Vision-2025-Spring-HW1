@@ -70,7 +70,7 @@ In this assignment, we utilize a model based on the ResNet architecture to class
 ### Confusion Matrix
 ![Image](image/confusion.png)
 ### Perfomance
-    ||Accuracy(%)|
-    |----------|--|
-    |Validation|90|
-    |Public test|93|
+||Accuracy(%)|
+|----------|--|
+|Validation|90|
+|Public test|93|
